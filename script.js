@@ -20,6 +20,23 @@ var SITE = {
     });
   }
 
+  /* Stats count-up. The final value is already in the HTML, so this is purely
+     an enhancement — with reduced motion we leave the numbers alone. */
+  if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
+    document.querySelectorAll('.stat .num[data-to]').forEach(function(el){
+      var target = parseInt(el.getAttribute('data-to'), 10);
+      if (!target) return;
+      var start = null, dur = 1100;
+      el.textContent = '0';
+      window.requestAnimationFrame(function step(ts){
+        if (start === null) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) window.requestAnimationFrame(step); else el.textContent = target;
+      });
+    });
+  }
+
   var slot = document.getElementById('contactEmailSlot');
   if (slot && SITE.contactEmail){
     slot.innerHTML = '<a href="mailto:' + SITE.contactEmail + '">' + SITE.contactEmail + '</a>';
